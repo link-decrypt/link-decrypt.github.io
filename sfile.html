@@ -50,32 +50,24 @@
             margin-top: 0;
         }
 
-        label {
-            display: block;
-            text-align: left;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #e0e0e0;
-        }
-
-        textarea {
+        .decoded-box {
             width: 100%;
-            height: 200px;
+            min-height: 200px;
             padding: 15px;
-            border: none;
             border-radius: 8px;
             font-size: 16px;
-            resize: vertical;
-            box-sizing: border-box;
             background-color: #3e3e3e;
             color: #e0e0e0;
-            transition: all 0.3s ease;
+            white-space: pre-wrap; /* biar enter kebaca */
+            word-wrap: break-word;
+            text-align: left;
         }
-        textarea:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(255, 126, 95, 0.5);
+
+        .decoded-box a {
+            color: #4da6ff;
+            text-decoration: underline;
         }
-        
+
         .footer-text {
             font-size: 0.9rem;
             color: #a0a0a0;
@@ -99,37 +91,34 @@
 
     <div class="container">
         <h1 class="header">Direct Link sFile .mobi</h1>
-        <p class="sub-header"> </p>
-        <label for="decodedText" style="display: none;">Teks yang didekripsi:</label>
-        <textarea id="decodedText" readonly></textarea>
-        <p class="footer-text">by https://t.me/sfilemobi_downloader_bot</p>
+        <p class="sub-header"></p>
+        <div id="decodedText" class="decoded-box"></div>
+        <p class="footer-text">by <a href="https://t.me/sfilemobi_downloader_bot" target="_blank">sFileMobi Downloader Bot</a></p>
     </div>
 
     <script>
-        // Fungsi yang akan dijalankan saat halaman selesai dimuat
-        document.addEventListener('DOMContentLoaded', (event) => {
-            // Mengambil semua parameter dari URL
+        document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            // Mengambil nilai dari parameter 'encrypt'
             const encryptedText = urlParams.get('encrypt');
+            const decodedDiv = document.getElementById('decodedText');
 
-            const decodedTextArea = document.getElementById('decodedText');
-
-            // Memeriksa apakah parameter 'encrypt' ada dan tidak kosong
             if (encryptedText) {
                 try {
-                    // Mendekode teks dari Base64
                     const decoded = atob(encryptedText);
-                    // Menampilkan hasil dekripsi di textarea
-                    decodedTextArea.value = decoded;
+
+                    // Deteksi link & ubah jadi klikable, teks lain tetap biasa
+                    const linkedText = decoded.replace(
+                        /(https?:\/\/[^\s]+)/g,
+                        '<a href="$1" target="_blank">$1</a>'
+                    );
+
+                    decodedDiv.innerHTML = linkedText;
                 } catch (e) {
-                    // Menangani error jika teks Base64 tidak valid
-                    decodedTextArea.value = "Error: Teks yang dienkripsi tidak valid.";
+                    decodedDiv.textContent = "Error: Teks yang dienkripsi tidak valid.";
                     console.error("Gagal mendekode Base64:", e);
                 }
             } else {
-                // Menampilkan pesan jika tidak ada parameter 'encrypt' di URL
-                decodedTextArea.value = "Tidak ada teks yang dienkripsi di URL. Contoh: ?encrypt=SGFsbG8gRHVuaWE=";
+                decodedDiv.textContent = "Tidak ada teks yang dienkripsi di URL. Contoh: ?encrypt=SGFsbG8gRHVuaWE=";
             }
         });
     </script>
